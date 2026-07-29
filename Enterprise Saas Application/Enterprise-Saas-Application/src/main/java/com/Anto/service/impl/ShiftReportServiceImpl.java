@@ -30,17 +30,12 @@ public class ShiftReportServiceImpl implements ShiftReportService {
 
         User currentUser = userService.getCurrentUser();
           LocalDateTime shiftStart = LocalDateTime.now();
-        LocalDateTime startOfDay=shiftStart.withHour(0).withMinute(0).withSecond(0);
 
-        LocalDateTime endOfDay=shiftStart.withHour(23).withMinute(59).withSecond(59);
+          Optional<ShiftReport> activeShift = shiftReportRepository.findTopByCashierAndShiftEndIsNullOrderByShiftStartDesc(currentUser);
 
-        Optional<ShiftReport> existing= shiftReportRepository.findByCashierAndShiftStartBetween(
-                currentUser, startOfDay, endOfDay
-        );
-
-        if (existing.isPresent()) {
-            throw new Exception("Shift already Started");
-        }
+          if (activeShift.isPresent()) {
+              throw new Exception("Shift already started");
+          }
 
         Branch branch = currentUser.getBranch();
 

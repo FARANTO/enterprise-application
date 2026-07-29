@@ -1,5 +1,6 @@
 package com.Anto.service.impl;
 
+import com.Anto.domain.UserRole;
 import com.Anto.mapper.ProductMapper;
 import com.Anto.modal.Category;
 import com.Anto.modal.Inventory;
@@ -34,6 +35,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO createProduct(ProductDTO productDTO, User user) throws Exception {
+        if (user == null || user.getRole() != UserRole.ROLE_ADMIN) {
+            throw new Exception("Only admin users may add new products.");
+        }
         Long storeId = productDTO.getStoreId();
 
         // 1. Resolve storeId from user if missing
@@ -98,6 +102,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO updateProduct(Long id, ProductDTO productDTO, User user) throws Exception {
+        if (user == null || user.getRole() != UserRole.ROLE_ADMIN) {
+            throw new Exception("Only admin users may update products.");
+        }
 
         Product product = productRepository.findById(id).orElseThrow(
                 () -> new Exception("Product not found with id: " + id)
@@ -147,6 +154,9 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public void deleteProduct(Long id, User user) throws Exception {
+        if (user == null || user.getRole() != UserRole.ROLE_ADMIN) {
+            throw new Exception("Only admin users may delete products.");
+        }
 
         Product product = productRepository.findById(id).orElseThrow(
                 () -> new Exception("Product not found with id: " + id)

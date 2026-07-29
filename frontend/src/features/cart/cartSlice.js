@@ -54,8 +54,12 @@ const cartSlice = createSlice({
     },
     setQty(state, action) {
       const { productId, quantity } = action.payload;
+      const qty = Number(quantity);
+      if (!Number.isFinite(qty) || qty < 1) {
+        return;
+      }
       const existing = state.items.find(i => i.productId === productId);
-      if (existing) existing.quantity = quantity;
+      if (existing) existing.quantity = qty;
     },
     clearCart(state) {
       state.items = [];

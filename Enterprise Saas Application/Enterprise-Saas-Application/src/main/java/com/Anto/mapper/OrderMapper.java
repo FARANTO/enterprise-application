@@ -2,6 +2,7 @@ package com.Anto.mapper;
 
 import com.Anto.modal.Order;
 import com.Anto.payload.dto.OrderDTO;
+import com.Anto.payload.dto.StoreDTO;
 
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -17,6 +18,8 @@ public class OrderMapper {
                .id(order.getId())
                .totalAmount(order.getTotalAmount())
                .branchId(order.getBranch() != null ? order.getBranch().getId() : null)
+               .storeId(order.getBranch() != null && order.getBranch().getStore() != null ? order.getBranch().getStore().getId() : null)
+               .store(StoreMapper.toDTO(order.getBranch() != null ? order.getBranch().getStore() : null))
                .cashier(UserMapper.toDTO(order.getCashier()))
                .customer(order.getCustomer())
                .paymentType(order.getPaymentType())

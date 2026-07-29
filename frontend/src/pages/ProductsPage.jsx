@@ -133,6 +133,8 @@ export default function ProductsPage() {
   const [editing, setEditing] = useState(null);
 
   const user = getCurrentUser();
+  const role = user?.role || user?.Role || '';
+  const isAdmin = role === 'ROLE_ADMIN';
 
   // Load stores on mount
   useEffect(() => {
@@ -283,7 +285,11 @@ export default function ProductsPage() {
             ))}
           </select>
           <Input placeholder="Search products (3+ chars)" value={query} onChange={(e) => setQuery(e.target.value)} className="max-w-sm" />
-          <Button onClick={() => { setEditing(null); setModalOpen(true); }}>New product</Button>
+          {isAdmin ? (
+            <Button onClick={() => { setEditing(null); setModalOpen(true); }}>New product</Button>
+          ) : (
+            <div className="text-sm text-muted-foreground">Only administrators can add or edit products.</div>
+          )}
         </div>
       </div>
 
@@ -310,8 +316,14 @@ export default function ProductsPage() {
                 <td className="px-4 py-3"><span className="font-mono">{product.storeId || '—'}</span></td>
                 <td className="px-4 py-3">{product.quantity ?? '—'}</td>
                 <td className="px-4 py-3 text-right">
-                  <Button variant="ghost" onClick={() => { setEditing(product); setModalOpen(true); }}>Edit</Button>
-                  <Button variant="destructive" onClick={() => onDelete(product.id)}>Delete</Button>
+                  {isAdmin ? (
+                    <>
+                      <Button variant="ghost" onClick={() => { setEditing(product); setModalOpen(true); }}>Edit</Button>
+                      <Button variant="destructive" onClick={() => onDelete(product.id)}>Delete</Button>
+                    </>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">View only</div>
+                  )}
                 </td>
               </tr>
             ))}

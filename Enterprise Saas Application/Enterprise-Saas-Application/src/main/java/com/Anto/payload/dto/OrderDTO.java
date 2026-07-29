@@ -2,6 +2,7 @@ package com.Anto.payload.dto;
 
 import com.Anto.domain.PaymentType;
 import com.Anto.modal.Customer;
+import com.Anto.payload.dto.StoreDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,9 @@ public class OrderDTO {
 
     private Long branchId;
     private Long customerId;
+    private Long storeId;
 
+    private StoreDTO store;
     private BranchDTO branch;
 
     private UserDto cashier;
