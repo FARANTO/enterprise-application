@@ -44,7 +44,12 @@ export default function POSPage(){
 
   function handleAdd(p){
     const qty = inventoryMap.get(p.id) ?? null;
-    if (qty !== null && qty <= 0) return toast.error('Out of stock');
+    if (qty === null) {
+      return toast.error('This product is not stocked in the selected branch');
+    }
+    if (qty <= 0) {
+      return toast.error('Out of stock');
+    }
     dispatch(addItem({ product: p, quantity: 1 }));
   }
 
@@ -85,6 +90,10 @@ export default function POSPage(){
     try{
       await dispatch(processPayment({ method, orderPayload })).unwrap();
       dispatch(clearDiscounts());
+      if (branchId) {
+        dispatch(fetchInventoryByBranch(branchId));
+      }
+      dispatch(getCurrentShift());
       toast.success('Payment successful — Order created');
     } catch {
       toast.error('Payment failed');

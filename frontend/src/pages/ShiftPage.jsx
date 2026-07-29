@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCurrentShift, startShift, endShift } from '@/features/shiftReports/shiftReportsSlice';
+import { getCurrentShift, startShift, endShift, fetchShiftHistory } from '@/features/shiftReports/shiftReportsSlice';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
 import { RequireRole } from '@/routes/AppRoutes';
@@ -8,17 +8,70 @@ import { RequireRole } from '@/routes/AppRoutes';
 export default function ShiftPage(){
   const dispatch = useDispatch();
   const shift = useSelector(s => s.shiftReports.current);
+  const history = useSelector(s => s.shiftReports.history || []);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-  useEffect(()=>{ dispatch(getCurrentShift()); }, [dispatch]);
+  const user = (() => {
+    try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
+  })();
+
+  useEffect(() => {
+    dispatch(getCurrentShift());
+    if (user?.id) {
+      dispatch(fetchShiftHistory(user.id));
+    }
+  }, [dispatch, user?.id]);
+
+  useEffect(() => {
+    if (!shift) {
+      setElapsedSeconds(0);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      const start = new Date(shift.shiftStart).getTime();
+      const now = Date.now();
+      setElapsedSeconds(Math.max(0, Math.floor((now - start) / 1000)));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [shift]);
 
   async function onStart(){
-    try{ await dispatch(startShift()).unwrap(); toast.success('Shift started'); } catch { toast.error('Failed to start'); }
+    try{
+      await dispatch(startShift()).unwrap();
+      if (user?.id) {
+        dispatch(fetchShiftHistory(user.id));
+      }
+      toast.success('Shift started');
+    } catch {
+      toast.error('Failed to start');
+    }
   }
 
   async function onEnd(){
-    try{ await dispatch(endShift()).unwrap(); toast.success('Shift ended'); setConfirmOpen(false); } catch { toast.error('Failed to end'); }
+    try{
+      await dispatch(endShift()).unwrap();
+      if (user?.id) {
+        dispatch(fetchShiftHistory(user.id));
+      }
+      dispatch(getCurrentShift());
+      toast.success('Shift ended');
+      setConfirmOpen(false);
+    } catch {
+      toast.error('Failed to end');
+    }
   }
+
+  function formatDuration(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+  }
+
+  const salaryAmount = (elapsedSeconds * 0.05).toFixed(2);
 
   return (
     <div>
@@ -36,8 +89,10 @@ export default function ShiftPage(){
             <div className="flex justify-between">
               <div>
                 <h3 className="text-lg font-semibold">Current Shift</h3>
-                <p className="text-sm text-muted-foreground">Cashier: {shift.cashier?.FullName || shift.cashierName || '—'}</p>
+                <p className="text-sm text-muted-foreground">Cashier: {shift.cashier?.fullName || shift.cashierName || '—'}</p>
                 <p className="text-sm text-muted-foreground">Started: {new Date(shift.shiftStart).toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">Elapsed: {formatDuration(elapsedSeconds)}</p>
+                <p className="text-sm text-muted-foreground">Salary earned: ₹{salaryAmount}</p>
               </div>
               <div className="text-right">
                 <div>Total Sales: ₹{shift.totalSales ?? 0}</div>
@@ -45,7 +100,7 @@ export default function ShiftPage(){
                 <div className="font-semibold">Net: ₹{shift.netSales ?? 0}</div>
               </div>
             </div>
-
+ 
             <div className="mt-4">
               <h4 className="font-semibold">Top Products</h4>
               <ul className="list-disc pl-6">
@@ -54,7 +109,6 @@ export default function ShiftPage(){
                 ))}
               </ul>
             </div>
-
             <div className="mt-4">
               <RequireRole roles={[ 'ROLE_BRANCH_MANAGER','ROLE_STORE_MANAGER','ROLE_STORE_ADMIN','ROLE_ADMIN' ]}>
                 <Button variant="destructive" onClick={()=>setConfirmOpen(true)}>Close Shift</Button>
@@ -77,6 +131,48 @@ export default function ShiftPage(){
           </div>
         </div>
       )}
+
+      <div className="mt-6 rounded-2xl border bg-card p-4 shadow-sm">
+        <h3 className="text-lg font-semibold mb-3">Shift History</h3>
+        {history.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No completed shifts found yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {history.map((record) => (
+              <div key={record.id} className="rounded-2xl border p-3 bg-background">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold">Shift #{record.id}</p>
+                    <p className="text-xs text-muted-foreground">{record.branch?.name || `Branch ${record.branchId || 'N/A'}`}</p>
+                  </div>
+                  <div className="text-right text-sm text-muted-foreground">
+                    <div>{record.shiftStart ? new Date(record.shiftStart).toLocaleString() : 'Start N/A'}</div>
+                    <div>{record.shiftEnd ? new Date(record.shiftEnd).toLocaleString() : 'Closed'}</div>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Sales</p>
+                    <p className="font-semibold text-emerald-600">₹{record.totalSales ?? 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Refunds</p>
+                    <p className="font-semibold text-rose-600">₹{record.totalRefunds ?? 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Net</p>
+                    <p className="font-semibold">₹{record.netSales ?? 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Orders</p>
+                    <p className="font-semibold">{record.totalOrders ?? 0}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

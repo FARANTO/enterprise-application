@@ -3,8 +3,10 @@ import axiosClient from '@/api/axiosClient';
 
 const initialState = {
   current: null,
+  history: [],
   list: [],
   status: 'idle',
+  historyStatus: 'idle',
   error: null,
 };
 
@@ -36,16 +38,28 @@ export const getCurrentShift = createAsyncThunk('shift/current', async (_, thunk
   }
 });
 
+export const fetchShiftHistory = createAsyncThunk('shift/fetchHistory', async (cashierId, thunkAPI) => {
+  try {
+    const res = await axiosClient.get(`/api/shift-reports/cashier/${cashierId}`);
+    return res.data;
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err?.response?.data?.message || err.message);
+  }
+});
+
 const shiftSlice = createSlice({
   name: 'shiftReports',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(startShift.fulfilled, (state, action) => { state.current = action.payload; state.status = 'succeeded'; })
-            .addCase(endShift.fulfilled, (state) => { state.current = null; state.status = 'succeeded'; })
+        .addCase(startShift.fulfilled, (state, action) => { state.current = action.payload; state.status = 'succeeded'; })
+        .addCase(endShift.fulfilled, (state) => { state.current = null; state.status = 'succeeded'; })
       .addCase(getCurrentShift.fulfilled, (state, action) => { state.current = action.payload; state.status = 'succeeded'; })
-            .addCase(getCurrentShift.rejected, (state) => { state.current = null; state.status = 'idle'; });
+        .addCase(getCurrentShift.rejected, (state) => { state.current = null; state.status = 'idle'; })
+        .addCase(fetchShiftHistory.pending, (state) => { state.historyStatus = 'loading'; })
+        .addCase(fetchShiftHistory.fulfilled, (state, action) => { state.historyStatus = 'succeeded'; state.history = action.payload || []; })
+        .addCase(fetchShiftHistory.rejected, (state, action) => { state.historyStatus = 'failed'; state.error = action.payload; });
   }
 });
 

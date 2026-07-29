@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductsByStore, searchProducts, createProduct, updateProduct, deleteProduct } from '@/features/products/productsSlice';
 import { fetchInventoryByBranch } from '@/features/inventory/inventorySlice';
 import { createCategory, fetchCategoriesByStore } from '@/features/categories/categoriesSlice';
-import { fetchStores } from '@/features/stores/storesSlice';
+import { fetchStores, fetchBranchesByStore } from '@/features/stores/storesSlice';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -125,6 +125,7 @@ export default function ProductsPage() {
   const categoriesState = useSelector((state) => state.categories);
   const storesState = useSelector((state) => state.stores);
   const [selectedStoreId, setSelectedStoreId] = useState('');
+  const [selectedBranchId, setSelectedBranchId] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
@@ -151,16 +152,25 @@ export default function ProductsPage() {
     if (selectedStoreId) {
       dispatch(fetchProductsByStore(Number(selectedStoreId)));
       dispatch(fetchCategoriesByStore(Number(selectedStoreId)));
+      dispatch(fetchBranchesByStore(Number(selectedStoreId)));
     }
   }, [selectedStoreId, dispatch]);
 
-  // Inventory (if user has a branch)
-  const branchId = user?.branchId;
   useEffect(() => {
-    if (branchId) {
-      dispatch(fetchInventoryByBranch(branchId));
+    if (!selectedBranchId && storesState.branches.length > 0) {
+      const defaultBranch = user?.branchId && storesState.branches.some((b) => String(b.id) === String(user.branchId))
+        ? String(user.branchId)
+        : String(storesState.branches[0].id);
+      setSelectedBranchId(defaultBranch);
     }
-  }, [branchId, dispatch]);
+  }, [storesState.branches, selectedBranchId, user?.branchId]);
+
+  // Inventory by selected branch
+  useEffect(() => {
+    if (selectedBranchId) {
+      dispatch(fetchInventoryByBranch(Number(selectedBranchId)));
+    }
+  }, [selectedBranchId, dispatch]);
 
   // Search
   useEffect(() => {
@@ -250,16 +260,26 @@ export default function ProductsPage() {
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-1 items-center gap-2">
-          {/* Store selector */}
+        <div className="flex flex-1 flex-wrap items-center gap-2">
           <select
             value={selectedStoreId}
-            onChange={(e) => { setSelectedStoreId(e.target.value); setPage(1); }}
-            className="h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm"
+            onChange={(e) => { setSelectedStoreId(e.target.value); setSelectedBranchId(''); setPage(1); }}
+            className="h-10 rounded-lg border border-input bg-transparent px-3 py-2 text-sm"
           >
             <option value="">Select store</option>
             {storesState.items.map((s) => (
               <option key={s.id} value={s.id}>ID {s.id} — {s.name}</option>
+            ))}
+          </select>
+          <select
+            value={selectedBranchId}
+            onChange={(e) => setSelectedBranchId(e.target.value)}
+            className="h-10 rounded-lg border border-input bg-transparent px-3 py-2 text-sm"
+            disabled={!storesState.branches.length}
+          >
+            <option value="">Select branch</option>
+            {storesState.branches.map((branch) => (
+              <option key={branch.id} value={branch.id}>{branch.name || `Branch ${branch.id}`}</option>
             ))}
           </select>
           <Input placeholder="Search products (3+ chars)" value={query} onChange={(e) => setQuery(e.target.value)} className="max-w-sm" />

@@ -129,12 +129,16 @@ public class OrderServiceImpl implements OrderService {
             );
             double unitPrice = product.getSellingPrice() != null ? product.getSellingPrice() : (itemDto.getPrice() != null ? itemDto.getPrice() : 0.0);
             int qty = itemDto.getQuantity() != null ? itemDto.getQuantity() : 1;
+            double originalPrice = itemDto.getOriginalPrice() != null ? itemDto.getOriginalPrice() : unitPrice;
+            double discountAmount = itemDto.getDiscountAmount() != null ? itemDto.getDiscountAmount() : 0.0;
+            double finalPrice = Math.max(originalPrice * qty - discountAmount, 0.0);
+
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
                     .quantity(qty)
-                    .price(unitPrice * qty)
-                    .originalPrice(itemDto.getOriginalPrice())
-                    .discountAmount(itemDto.getDiscountAmount())
+                    .price(finalPrice)
+                    .originalPrice(originalPrice)
+                    .discountAmount(discountAmount)
                     .discountType(itemDto.getDiscountMode())
                     .discountValue(itemDto.getDiscountValue())
                     .order(order)
@@ -157,7 +161,10 @@ public class OrderServiceImpl implements OrderService {
         }
 
         double total = orderItems.stream().mapToDouble(OrderItem::getPrice).sum();
-        order.setTotalAmount(total > 0 ? total : (orderDTO.getTotalAmount() != null ? orderDTO.getTotalAmount() : 0.0));
+        if (orderDTO.getTotalAmount() != null && orderDTO.getTotalAmount() > 0) {
+            total = orderDTO.getTotalAmount();
+        }
+        order.setTotalAmount(total);
         order.setItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);
