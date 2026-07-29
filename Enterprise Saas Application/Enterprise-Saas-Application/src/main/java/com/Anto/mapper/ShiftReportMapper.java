@@ -45,7 +45,7 @@ public class ShiftReportMapper {
         return refunds.stream().map(RefundMapper::toDTO).collect(Collectors.toList());
     }
 
-    private static List<ProductDTO> mapProducts(List<Product> topSellingProducts) {
+    private static List<ProductDTO> mapProducts(java.util.Collection<Product> topSellingProducts) {
         if (topSellingProducts == null || topSellingProducts.isEmpty()) {return null;}
         return topSellingProducts.stream().map(ProductMapper::toDTO).collect(Collectors.toList());
     }

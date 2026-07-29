@@ -41,7 +41,7 @@ public class RefundServiceImpl implements RefundService {
         Branch branch=order.getBranch();
 
         Refund createdRefund=Refund.builder()
-                .order(order)
+                .orderId(order.getId())
                 .cashier(cashier)
                 .branch(branch)
                 .reason(refund.getReason())

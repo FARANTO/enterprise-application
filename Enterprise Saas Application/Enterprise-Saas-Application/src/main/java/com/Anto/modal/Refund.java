@@ -20,8 +20,8 @@ public class Refund {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    private Order order;
+    @Column(name = "order_id")
+    private Long orderId;
 
     @ManyToOne
     private User cashier;

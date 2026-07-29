@@ -37,11 +37,16 @@ public class ShiftReport {
     @CollectionTable(name = "shift_report_payment_summaries", joinColumns = @JoinColumn(name = "shift_report_id"))
     private List<PaymentSummary> paymentSummaries;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Product> topSellingProducts;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "shift_report_top_selling_products",
+            joinColumns = @JoinColumn(name = "shift_report_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private java.util.Set<Product> topSellingProducts;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Order> recentOrders;
+    private java.util.List<Order> recentOrders;
 
     @OneToMany(mappedBy = "shiftReport", cascade = CascadeType.ALL)
     private List<Refund> refunds;

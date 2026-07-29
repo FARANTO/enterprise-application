@@ -25,7 +25,8 @@ export const processPayment = createAsyncThunk('cart/processPayment', async ({ m
     const response = await axiosClient.post('/api/orders', { ...orderPayload, paymentType: method });
     return response.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue(err?.response?.data?.message || err.message || 'Payment failed');
+    console.error('processPayment error', err, err?.response?.data);
+    return thunkAPI.rejectWithValue(err?.response?.data || { message: err.message || 'Payment failed' });
   }
 });
 

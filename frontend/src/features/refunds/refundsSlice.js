@@ -13,7 +13,8 @@ export const createRefund = createAsyncThunk('refunds/create', async (refundDTO,
     const res = await axiosClient.post('/api/refunds', refundDTO);
     return res.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue(err?.response?.data?.message || err.message);
+    console.error('createRefund error', err, err?.response?.data);
+    return thunkAPI.rejectWithValue(err?.response?.data || { message: err.message });
   }
 });
 
@@ -22,7 +23,8 @@ export const fetchAllRefunds = createAsyncThunk('refunds/fetchAll', async (_, th
     const res = await axiosClient.get('/api/refunds');
     return res.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue(err?.response?.data?.message || err.message);
+    console.error('fetchAllRefunds error', err, err?.response?.data);
+    return thunkAPI.rejectWithValue(err?.response?.data || { message: err.message });
   }
 });
 
@@ -31,7 +33,8 @@ export const fetchRefundsByBranch = createAsyncThunk('refunds/fetchByBranch', as
     const res = await axiosClient.get(`/api/refunds/branch/${branchId}`);
     return res.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue(err?.response?.data?.message || err.message);
+    console.error('fetchRefundsByBranch error', err, err?.response?.data);
+    return thunkAPI.rejectWithValue(err?.response?.data || { message: err.message });
   }
 });
 
@@ -40,7 +43,8 @@ export const fetchRefundsByShift = createAsyncThunk('refunds/fetchByShift', asyn
     const res = await axiosClient.get(`/api/refunds/shift/${shiftId}`);
     return res.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue(err?.response?.data?.message || err.message);
+    console.error('fetchRefundsByShift error', err, err?.response?.data);
+    return thunkAPI.rejectWithValue(err?.response?.data || { message: err.message });
   }
 });
 
@@ -49,7 +53,8 @@ export const fetchRefundsByCashier = createAsyncThunk('refunds/fetchByCashier', 
     const res = await axiosClient.get(`/api/refunds/cashier/${cashierId}`);
     return res.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue(err?.response?.data?.message || err.message);
+    console.error('fetchRefundsByCashier error', err, err?.response?.data);
+    return thunkAPI.rejectWithValue(err?.response?.data || { message: err.message });
   }
 });
 
@@ -61,7 +66,8 @@ export const fetchRefundsByDateRange = createAsyncThunk('refunds/fetchByDateRang
     const res = await axiosClient.get(`/api/refunds?${params.toString()}`);
     return res.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue(err?.response?.data?.message || err.message);
+    console.error('fetchRefundsByDateRange error', err, err?.response?.data);
+    return thunkAPI.rejectWithValue(err?.response?.data || { message: err.message });
   }
 });
 
@@ -70,7 +76,8 @@ export const fetchRefundById = createAsyncThunk('refunds/fetchById', async (refu
     const res = await axiosClient.get(`/api/refunds/${refundId}`);
     return res.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue(err?.response?.data?.message || err.message);
+    console.error('fetchRefundById error', err, err?.response?.data);
+    return thunkAPI.rejectWithValue(err?.response?.data || { message: err.message });
   }
 });
 

@@ -34,7 +34,7 @@ public class ShiftReportServiceImpl implements ShiftReportService {
           Optional<ShiftReport> activeShift = shiftReportRepository.findTopByCashierAndShiftEndIsNullOrderByShiftStartDesc(currentUser);
 
           if (activeShift.isPresent()) {
-              throw new Exception("Shift already started");
+              return ShiftReportMapper.toDTO(activeShift.get());
           }
 
         Branch branch = currentUser.getBranch();
@@ -88,7 +88,9 @@ public class ShiftReportServiceImpl implements ShiftReportService {
         shiftReport.setTotalOrders(totalOrders);
         shiftReport.setNetSales(netSales);
         shiftReport.setRecentOrders(getRecentOrders(orders));
-        shiftReport.setTopSellingProducts(getTopSellingProducts(orders));
+        // Use a Set to avoid duplicate product entries
+        java.util.Set<com.Anto.modal.Product> topProducts = new java.util.LinkedHashSet<>(getTopSellingProducts(orders));
+        shiftReport.setTopSellingProducts(topProducts);
         shiftReport.setPaymentSummaries(getPaymentSummaries(orders, totalSales));
         refunds.forEach(refund -> refund.setShiftReport(shiftReport));
         shiftReport.setRefunds(refunds);
@@ -130,13 +132,16 @@ public class ShiftReportServiceImpl implements ShiftReportService {
 
         User user = userService.getCurrentUser();
 
-        ShiftReport shiftReport= shiftReportRepository.findTopByCashierAndShiftEndIsNullOrderByShiftStartDesc(user).orElseThrow(
-                () -> new Exception("No active shift found for cashier")
-        );
+        Optional<ShiftReport> optionalShiftReport = shiftReportRepository.findTopByCashierAndShiftEndIsNullOrderByShiftStartDesc(user);
+        if (optionalShiftReport.isEmpty()) {
+            return null;
+        }
+
+        ShiftReport shiftReport = optionalShiftReport.get();
 
         LocalDateTime now = LocalDateTime.now();
-        List<Order> orders = orderRepository.findByCashierAndCreatedAtBetween(user,  shiftReport.getShiftStart(),  now);
-        List<Refund> refunds=refundRepository.findByCashierIdAndCreatedAtBetween(
+        List<Order> orders = orderRepository.findByCashierAndCreatedAtBetween(user, shiftReport.getShiftStart(), now);
+        List<Refund> refunds = refundRepository.findByCashierIdAndCreatedAtBetween(
                 user.getId(),
                 shiftReport.getShiftStart(), now
         );
@@ -154,7 +159,9 @@ public class ShiftReportServiceImpl implements ShiftReportService {
         shiftReport.setTotalOrders(totalOrders);
         shiftReport.setNetSales(netSales);
         shiftReport.setRecentOrders(getRecentOrders(orders));
-        shiftReport.setTopSellingProducts(getTopSellingProducts(orders));
+        // Use a Set to avoid duplicate product entries
+        java.util.Set<com.Anto.modal.Product> topProducts = new java.util.LinkedHashSet<>(getTopSellingProducts(orders));
+        shiftReport.setTopSellingProducts(topProducts);
         shiftReport.setPaymentSummaries(getPaymentSummaries(orders, totalSales));
         refunds.forEach(refund -> refund.setShiftReport(shiftReport));
         shiftReport.setRefunds(refunds);

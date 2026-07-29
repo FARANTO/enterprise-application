@@ -43,6 +43,7 @@ export default function POSPage(){
   const isCashier = role === 'ROLE_BRANCH_CASHIER';
   const canChangeStore = isAdmin || isStoreAdmin || isStoreManager;
   const canChangeBranch = isAdmin || isStoreAdmin || isStoreManager;
+  const canStartShiftOnPOS = isCashier;
   const branchFixed = isBranchManager || isCashier;
 
   useEffect(() => {
@@ -192,8 +193,8 @@ export default function POSPage(){
       <div className="col-span-2">
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <input className="input flex-1 min-w-[220px]" placeholder="Search products" value={query} onChange={e=>setQuery(e.target.value)} />
-        {/* Only branch-level users can start a shift here */}
-        {(isCashier || isBranchManager) && !shift && (
+        {/* Only cashiers should start shifts from the POS screen; branch managers can start shifts from the Shift page */}
+        {canStartShiftOnPOS && !shift && (
           <Button onClick={onStartShift}>Start Shift</Button>
         )}
         </div>
@@ -311,8 +312,7 @@ export default function POSPage(){
 
           {/* Helper message explaining why payment might be disabled */}
           {cart.length === 0 && <div className="text-xs text-muted-foreground mt-2">Add products to the cart to enable payment.</div>}
-          {cart.length > 0 && !shift && (isCashier || isBranchManager) && <div className="text-xs text-orange-600 mt-2">No active shift — clicking Pay will attempt to start your shift automatically.</div>}
-          {cart.length > 0 && !shift && !(isCashier || isBranchManager) && <div className="text-xs text-red-600 mt-2">Open a shift before checkout.</div>}
+          {cart.length > 0 && !shift && <div className="text-xs text-orange-600 mt-2">Payments are disabled until a shift is active.</div>}
         </div>
 
         <div className="mt-4">

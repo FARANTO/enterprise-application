@@ -12,7 +12,7 @@ public class RefundMapper {
 
         return RefundDTO.builder()
                 .id(refund.getId())
-                .orderId(refund.getOrder() != null ? refund.getOrder().getId() : null)
+                .orderId(refund.getOrderId())
                 .reason(refund.getReason())
                 .amount(refund.getAmount())
                 .cashierName(refund.getCashier() != null ? refund.getCashier().getFullName() : null)

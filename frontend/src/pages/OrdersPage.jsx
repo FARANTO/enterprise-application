@@ -151,7 +151,7 @@ export default function OrdersPage(){
                 <Button variant="ghost" onClick={()=>setSelected(o)}>View</Button>
                 <Button variant="outline" onClick={()=>printReceipt(o)}>Print</Button>
               {/* Refund button per order for authorized roles */}
-              <RequireRole roles={[ 'ROLE_BRANCH_MANAGER','ROLE_STORE_MANAGER','ROLE_STORE_ADMIN','ROLE_ADMIN' ]}>
+              <RequireRole roles={[ 'ROLE_BRANCH_CASHIER','ROLE_BRANCH_MANAGER','ROLE_STORE_MANAGER','ROLE_STORE_ADMIN','ROLE_ADMIN' ]}>
                 <Button variant="destructive" onClick={()=>{ setSelected(o); setRefundOpen(true); }}>Refund</Button>
               </RequireRole>
             </td>
@@ -188,7 +188,7 @@ export default function OrdersPage(){
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button variant="outline" onClick={()=>printReceipt(selected)}>Print</Button>
-                <RequireRole roles={[ 'ROLE_BRANCH_MANAGER','ROLE_STORE_MANAGER','ROLE_STORE_ADMIN','ROLE_ADMIN' ]}>
+                <RequireRole roles={[ 'ROLE_BRANCH_CASHIER','ROLE_BRANCH_MANAGER','ROLE_STORE_MANAGER','ROLE_STORE_ADMIN','ROLE_ADMIN' ]}>
                   <Button variant="destructive" onClick={()=>setRefundOpen(true)}>Refund</Button>
                 </RequireRole>
               </div>
