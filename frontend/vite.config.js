@@ -18,4 +18,8 @@ export default defineConfig({
       '/auth': 'http://localhost:5000',
     },
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+  },
 })

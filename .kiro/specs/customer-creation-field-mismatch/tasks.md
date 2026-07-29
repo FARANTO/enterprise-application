@@ -1,0 +1,111 @@
+# Implementation Plan
+
+- [x] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Field Mismatch Causes Customer Creation Failure
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists
+  - **Scoped PBT Approach**: Scope the property to concrete failing cases - customer creation requests using `name` and `contact` field names
+  - Test that customer creation with `{ name: validName, contact: validPhone }` payload fails with constraint violation (from Bug Condition in design)
+  - The test assertions should verify:
+    - Backend receives payload with `name` field instead of `fullName`
+    - Backend receives payload with `contact` field instead of `phone`
+    - Database constraint violation occurs due to NULL `fullName`
+    - System returns 400/500 error status code
+    - Customer is NOT created in the database
+  - Run test on UNFIXED code (current CustomerModal component)
+  - **EXPECTED OUTCOME**: Test FAILS (this is correct - it proves the bug exists)
+  - Document counterexamples found: "Payload { name: 'John Doe', contact: '1234567890' } causes database constraint violation instead of creating customer successfully"
+  - Mark task complete when test is written, run, and failure is documented
+  - _Requirements: 1.1, 1.2, 1.3, 1.4_
+
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Existing Customer Operations Remain Functional
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-buggy operations:
+    - GET /api/customers successfully retrieves customer list with `fullName`, `phone`, `email` fields
+    - Customer update operations function correctly
+    - Customer delete operations function correctly
+    - Customer table display renders existing records properly
+    - Optional email field handling works in customer forms
+  - Write property-based tests capturing observed behavior patterns from Preservation Requirements:
+    - For all valid customer IDs, GET /api/customers returns customers with correct field mappings (`fullName`, `phone`, `email`)
+    - For all valid update payloads, customer updates succeed without field mapping issues
+    - For all valid customer IDs, delete operations succeed
+    - For all existing customer records, table display correctly maps and renders data
+    - For all customer creation attempts with email field, email is correctly saved
+  - Property-based testing generates many test cases for stronger guarantees
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [x] 3. Fix for customer creation field mismatch
+
+  - [x] 3.1 Update frontend CustomerModal component form state
+    - Locate CustomerModal component file (likely in frontend/src/components or similar path)
+    - Change form state field names from `name` to `fullName`
+    - Change form state field names from `contact` to `phone`
+    - Update form field onChange handlers to use `fullName` and `phone`
+    - Update form initialization to use `fullName` and `phone`
+    - _Bug_Condition: isBugCondition(X) where (X.hasField("name") AND NOT X.hasField("fullName")) OR (X.hasField("contact") AND NOT X.hasField("phone"))_
+    - _Expected_Behavior: payload.hasField("fullName") AND payload.hasField("phone") AND NOT payload.hasField("name") AND NOT payload.hasField("contact") AND result.success = true_
+    - _Preservation: Customer retrieval, update, delete operations; optional email field handling; customer table display rendering_
+    - _Requirements: 1.1, 2.1, 2.2, 2.3, 2.4_
+
+  - [x] 3.2 Update form payload construction
+    - Locate the API call/payload construction code in CustomerModal
+    - Ensure payload is sent with `fullName` field instead of `name`
+    - Ensure payload is sent with `phone` field instead of `contact`
+    - Verify `email` field (if present) remains unchanged
+    - _Bug_Condition: isBugCondition(X) where payload uses incorrect field names_
+    - _Expected_Behavior: Backend receives { fullName, phone, email? } payload matching Customer entity expectations_
+    - _Preservation: Optional email field handling preserved_
+    - _Requirements: 2.1, 2.2, 3.1_
+
+  - [x] 3.3 Update form UI labels and validation (if needed)
+    - Check if form input labels reference the field names directly
+    - Update any hardcoded "name" or "contact" labels if they reference field names
+    - Verify form validation rules still apply correctly to `fullName` and `phone`
+    - Ensure required field validation enforces non-empty `fullName`
+    - _Preservation: Form validation rules (e.g., name cannot be empty) continue to function_
+    - _Requirements: 2.1, 3.5_
+
+  - [x] 3.4 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Field Mapping Enables Successful Customer Creation
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
+    - Verify payload now contains `fullName` and `phone` fields
+    - Verify customer creation succeeds with 200/201 status code
+    - Verify customer record is persisted with non-null `fullName`
+    - Verify success toast notification is displayed
+    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+
+  - [x] 3.5 Verify preservation tests still pass
+    - **Property 2: Preservation** - Existing Customer Operations Remain Functional
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Confirm all tests still pass after fix (no regressions):
+      - Customer retrieval returns correct field mappings
+      - Customer update operations function correctly
+      - Customer delete operations function correctly
+      - Customer table display renders properly
+      - Optional email field handling works
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Run the complete test suite to verify all tests pass
+  - Manually test customer creation flow in the UI:
+    - Open Customers page
+    - Click "Add Customer" or similar button
+    - Fill in name and phone fields
+    - Submit the form
+    - Verify success toast appears
+    - Verify customer appears in the customers table
+  - Verify no console errors during customer creation
+  - Ask the user if questions arise or if additional verification is needed

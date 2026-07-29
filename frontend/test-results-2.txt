@@ -1,0 +1,54 @@
+
+ RUN  v4.1.10 e:/Web Projects/enterprise-application/frontend
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/simple.test.js [ src/simple.test.js ]
+ FAIL  src/pages/CustomerCreation.bugcondition.test.js [ src/pages/CustomerCreation.bugcondition.test.js ]
+ FAIL  src/pages/CustomersPage.exploration.test.js [ src/pages/CustomersPage.exploration.test.js ]
+ FAIL  src/pages/CustomersPage.test.jsx [ src/pages/CustomersPage.test.jsx ]
+Error: Failed to resolve import "@testing-library/jest-dom" from "src/test/setup.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: E:/Web Projects/enterprise-application/frontend/src/test/setup.js:2:7
+  1  |  // Test setup file for Vitest
+  2  |  import "@testing-library/jest-dom";
+     |          ^
+  3  |  // This setup file is executed before each test file
+  4  |  // No global afterEach should be defined here as it causes context errors
+ ❯ TransformPluginContext._formatLog ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:30416:39
+ ❯ TransformPluginContext.error ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:30413:14
+ ❯ normalizeUrl ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:27438:18
+ ❯ ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:27506:30
+ ❯ TransformPluginContext.transform ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:27474:4
+ ❯ EnvironmentPluginContainer.transform ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:30201:14
+ ❯ loadAndTransform ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:20124:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/pages/CustomersPage.preservation.test.js [ src/pages/CustomersPage.preservation.test.js ]
+Error: Failed to resolve import "@testing-library/jest-dom" from "src/test/setup.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: E:/Web Projects/enterprise-application/frontend/src/test/setup.js:2:7
+  1  |  // Test setup file for Vitest
+  2  |  import "@testing-library/jest-dom";
+     |          ^
+  3  |  // This setup file is executed before each test file
+  4  |  // No global afterEach should be defined here as it causes context errors
+ ❯ TransformPluginContext._formatLog ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:30416:39
+ ❯ TransformPluginContext.error ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:30413:14
+ ❯ normalizeUrl ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:27438:18
+ ❯ ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:27506:30
+ ❯ TransformPluginContext.transform ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:27474:4
+ ❯ EnvironmentPluginContainer.transform ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:30201:14
+ ❯ loadAndTransform ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:20124:26
+ ❯ fetchModule ../../../Web%20Projects/enterprise-application/frontend/node_modules/vite/dist/node/chunks/node.js:33584:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+
+ Test Files  5 failed (5)
+      Tests  no tests
+   Start at  13:08:13
+   Duration  1.53s (transform 0ms, setup 0ms, import 0ms, tests 0ms, environment 6.10s)
+

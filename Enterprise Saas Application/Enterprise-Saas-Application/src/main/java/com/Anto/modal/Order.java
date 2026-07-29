@@ -23,6 +23,14 @@ public class Order {
 
     private Double totalAmount;
 
+    // Discount tracking fields
+    private Double originalAmount;        // Total before discounts
+    private Double discountAmount;        // Total discount applied
+    private String discountType;          // "PERCENTAGE" | "FLAT" | "ITEM_LEVEL" | null
+    private Double discountPercentage;    // For percentage discounts (0-100)
+    private Double discountFlat;          // For flat amount discounts
+    private Long authorizedBy;            // Manager ID if discount required authorization
+
     private LocalDateTime createdAt;
 
     @ManyToOne

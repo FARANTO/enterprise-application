@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 e:/Web Projects/enterprise-application/frontend
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/simple.test.js [ src/simple.test.js ]
+ FAIL  src/pages/CustomerCreation.bugcondition.test.js [ src/pages/CustomerCreation.bugcondition.test.js ]
+ FAIL  src/pages/CustomersPage.exploration.test.js [ src/pages/CustomersPage.exploration.test.js ]
+ FAIL  src/pages/CustomersPage.preservation.test.js [ src/pages/CustomersPage.preservation.test.js ]
+ FAIL  src/pages/CustomersPage.test.jsx [ src/pages/CustomersPage.test.jsx ]
+Error: Vitest failed to find the current suite. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ src/test/setup.js:5:1
+      3|
+      4| // Cleanup after each test
+      5| afterEach(() => {
+       | ^
+      6|   vi.clearAllMocks();
+      7| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+
+ Test Files  5 failed (5)
+      Tests  no tests
+   Start at  13:07:34
+   Duration  1.64s (transform 33ms, setup 0ms, import 0ms, tests 0ms, environment 6.37s)
+

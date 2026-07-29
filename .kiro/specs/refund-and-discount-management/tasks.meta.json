@@ -1,0 +1,322 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Backend: Extend Order and OrderItem entities with discount fields": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311837910
+      },
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311856024
+      }
+    ],
+    "2.1 Create `validateDiscount` method in OrderService": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838024
+      },
+      {
+        "executionId": "f4c98bc2-11b3-46b1-be01-78f2f9dd5450",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785312065907
+      }
+    ],
+    "3.1 Add discount state structure to cartSlice initial state": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838123
+      },
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311856725
+      },
+      {
+        "executionId": "f4c98bc2-11b3-46b1-be01-78f2f9dd5450",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785312055894
+      }
+    ],
+    "3.2 Create discount reducer actions": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838199
+      },
+      {
+        "executionId": "f4c98bc2-11b3-46b1-be01-78f2f9dd5450",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785312064324
+      }
+    ],
+    "3.3 Enhance selectCartTotals selector with discount calculations": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838308
+      }
+    ],
+    "4.1 Add new async thunks for refund filtering": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838391
+      },
+      {
+        "executionId": "f4c98bc2-11b3-46b1-be01-78f2f9dd5450",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785312064922
+      }
+    ],
+    "4.2 Add selectedRefund and filters to refundsSlice state": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838490
+      }
+    ],
+    "5. Checkpoint - Ensure Redux state management is working": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838592
+      }
+    ],
+    "6.1 Create DiscountModal component structure": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838687
+      }
+    ],
+    "6.2 Implement Order Discount tab": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838774
+      }
+    ],
+    "6.3 Implement Item Discount tab": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838856
+      }
+    ],
+    "6.4 Add client-side validation to DiscountModal": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311838963
+      }
+    ],
+    "6.5 Implement Apply and Cancel handlers": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839058
+      }
+    ],
+    "7.1 Add discount display to POS cart summary": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839181
+      }
+    ],
+    "7.2 Add \"Apply Discount\" button to POS interface": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839273
+      }
+    ],
+    "7.3 Update processPayment to include discount data": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839357
+      }
+    ],
+    "8.1 Create RefundModal component": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839439
+      }
+    ],
+    "8.2 Add order lookup and display": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839535
+      }
+    ],
+    "8.3 Implement refund amount controls": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839639
+      }
+    ],
+    "8.4 Add refund reason textarea with validation": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839740
+      }
+    ],
+    "8.5 Implement payment type selector with authorization": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839855
+      }
+    ],
+    "8.6 Add Save and Cancel handlers": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311839937
+      }
+    ],
+    "9.1 Create RefundsPage component structure": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840020
+      }
+    ],
+    "9.2 Implement refunds table": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840143
+      }
+    ],
+    "9.3 Implement filter controls": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840239
+      }
+    ],
+    "9.4 Add role-based data filtering": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840319
+      }
+    ],
+    "9.5 Integrate RefundModal": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840397
+      }
+    ],
+    "9.6 Add loading and error states": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840520
+      }
+    ],
+    "10. Checkpoint - Ensure frontend components are functional": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840606
+      }
+    ],
+    "11.1 Add Refunds route to router configuration": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840704
+      }
+    ],
+    "11.2 Add Refunds link to sidebar navigation": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840780
+      }
+    ],
+    "12.1 Enhance shift report calculation to include refund data": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840863
+      }
+    ],
+    "13.1 Create RefundHistory component": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311840948
+      }
+    ],
+    "13.2 Integrate RefundHistory into Order detail page/modal": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311841029
+      }
+    ],
+    "14.1 Add comprehensive error handling to frontend": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311841132
+      }
+    ],
+    "14.2 Add loading states and disabled button handling": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311841238
+      }
+    ],
+    "15.1 Test complete refund workflow end-to-end": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311841353
+      }
+    ],
+    "15.2 Test complete discount workflow end-to-end": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311841447
+      }
+    ],
+    "15.3 Test item-level discount workflow": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311841547
+      }
+    ],
+    "15.4 Test authorization and role-based access": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311841638
+      }
+    ],
+    "16. Final checkpoint - Ensure all functionality is working correctly": [
+      {
+        "executionId": "7c155ba0-e24e-4450-8324-9de43330f7e6",
+        "chatSessionId": "sess_571359c7-4d74-43ed-b408-991a71d1baa3",
+        "timestamp": 1785311841740
+      }
+    ]
+  }
+}

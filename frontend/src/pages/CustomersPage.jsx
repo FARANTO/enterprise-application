@@ -5,15 +5,15 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
 
 function CustomerModal({ open, initial, onClose, onSave }){
-  const [form, setForm] = useState(() => initial || { name: '', contact: '' });
-  function submit(){ if(!form.name) return toast.error('Name required'); onSave(form); }
+  const [form, setForm] = useState(() => initial || { fullName: '', phone: '' });
+  function submit(){ if(!form.fullName) return toast.error('Name required'); onSave(form); }
   if(!open) return null;
   return (
     <div key={initial?.id || 'new'} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="w-full max-w-md bg-card p-4 rounded">
         <h3 className="text-lg font-semibold mb-2">{initial ? 'Edit' : 'New'} Customer</h3>
-        <label className="block mb-2"><span className="text-sm">Name</span><input name="name" value={form.name} onChange={e=>setForm({...form, name: e.target.value})} className="w-full input mt-1"/></label>
-        <label className="block mb-2"><span className="text-sm">Contact</span><input name="contact" value={form.contact} onChange={e=>setForm({...form, contact: e.target.value})} className="w-full input mt-1"/></label>
+        <label className="block mb-2"><span className="text-sm">Name</span><input name="fullName" value={form.fullName} onChange={e=>setForm({...form, fullName: e.target.value})} className="w-full input mt-1" required /></label>
+        <label className="block mb-2"><span className="text-sm">Phone</span><input name="phone" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full input mt-1"/></label>
         <div className="flex gap-2 justify-end mt-3"><Button variant="outline" onClick={onClose}>Cancel</Button><Button onClick={submit}>{initial ? 'Save' : 'Create'}</Button></div>
       </div>
     </div>
