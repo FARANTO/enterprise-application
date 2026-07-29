@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductsByStore } from '@/features/products/productsSlice';
 import { fetchInventoryByBranch } from '@/features/inventory/inventorySlice';
 import { getCurrentShift, startShift } from '@/features/shiftReports/shiftReportsSlice';
-import { addItem, removeItem, setQty, selectCartTotals, processPayment, holdOrder, resumeOrder } from '@/features/cart/cartSlice';
+import { addItem, removeItem, setQty, selectCartTotals, processPayment, holdOrder, resumeOrder, clearDiscounts, applyOrderDiscount, applyItemDiscount } from '@/features/cart/cartSlice';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
+import DiscountModal from '@/components/pos/DiscountModal';
+import RefundOrderModal from '@/components/pos/RefundOrderModal';
 
 function getCurrentUser(){ try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; } }
 
@@ -19,10 +21,13 @@ export default function POSPage(){
   const inventory = useSelector(s => s.inventory.items || []);
   const shift = useSelector(s => s.shiftReports.current);
   const cart = useSelector(s => s.cart.items);
+  const discount = useSelector(s => s.cart.discount);
   const cartTotals = useSelector(selectCartTotals);
   const cartStatus = useSelector(s => s.cart.status);
 
   const [query, setQuery] = useState('');
+  const [discountModalOpen, setDiscountModalOpen] = useState(false);
+  const [refundOrderOpen, setRefundOrderOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProductsByStore(storeId));
@@ -57,15 +62,29 @@ export default function POSPage(){
     if (!shift) return toast.error('Open a shift before checkout');
 
     const orderPayload = {
-      totalAmount: cartTotals.subtotal,
+      totalAmount: cartTotals.finalTotal,
+      originalAmount: cartTotals.subtotal,
+      discountAmount: cartTotals.discountAmount,
+      discountType: discount?.type || null,
+      discountMode: discount?.type === 'order' ? discount.orderDiscount.mode : null,
+      discountValue: discount?.type === 'order' ? discount.orderDiscount.value : null,
       branchId: branchId,
       customerId: null,
       paymentType: method,
-      items: cart.map(i => ({ productId: i.productId, quantity: i.quantity, price: i.price })),
+      items: cart.map(i => ({ 
+        productId: i.productId,
+        quantity: i.quantity,
+        price: i.price,
+        originalPrice: i.price,
+        discountAmount: discount?.itemDiscounts?.[i.productId]?.calculatedAmount || 0,
+        discountMode: discount?.itemDiscounts?.[i.productId]?.mode || null,
+        discountValue: discount?.itemDiscounts?.[i.productId]?.value || null,
+      })),
     };
 
     try{
       await dispatch(processPayment({ method, orderPayload })).unwrap();
+      dispatch(clearDiscounts());
       toast.success('Payment successful — Order created');
     } catch {
       toast.error('Payment failed');
@@ -73,6 +92,23 @@ export default function POSPage(){
   }
 
   function onHold(){ dispatch(holdOrder({ name: `Held by ${user?.FullName || user?.Email || 'User'}` })); toast.info('Order held'); }
+
+  function handleApplyDiscount(discountConfig) {
+    if (!discountConfig) return;
+    if (Array.isArray(discountConfig)) {
+      discountConfig.forEach((config) => {
+        if (config.productId) {
+          dispatch(applyItemDiscount({ productId: config.productId, mode: config.mode, value: config.value }));
+        }
+      });
+    } else if (discountConfig.type === 'order') {
+      dispatch(applyOrderDiscount({ mode: discountConfig.mode, value: discountConfig.value }));
+    } else if (discountConfig.type === 'item') {
+      const { productId, mode, value } = discountConfig;
+      dispatch(applyItemDiscount({ productId, mode, value }));
+    }
+    setDiscountModalOpen(false);
+  }
 
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -119,10 +155,16 @@ export default function POSPage(){
 
         <div className="mt-4">
           <div>Items: {cartTotals.totalItems}</div>
-          <div className="text-lg font-semibold">Total: ₹{cartTotals.subtotal}</div>
+          <div>Original Total: ₹{cartTotals.subtotal}</div>
+          {cartTotals.discountAmount > 0 && (
+            <div className="text-sm text-red-600">Discount: -₹{cartTotals.discountAmount.toFixed(2)} {cartTotals.discountType === 'order' ? `(${discount.orderDiscount.mode})` : ''}</div>
+          )}
+          <div className="text-lg font-semibold">Final Total: ₹{cartTotals.finalTotal.toFixed(2)}</div>
         </div>
 
         <div className="mt-3 flex flex-col gap-2">
+          <Button onClick={() => setDiscountModalOpen(true)} disabled={cart.length === 0}>Apply Discount</Button>
+          <Button onClick={() => setRefundOrderOpen(true)}>Refund Order</Button>
           <Button onClick={()=>onCheckout('CASH')} disabled={!shift || cart.length===0 || cartStatus==='loading'}>Pay Cash</Button>
           <Button onClick={()=>onCheckout('CARD')} disabled={!shift || cart.length===0 || cartStatus==='loading'}>Pay Card</Button>
           <Button onClick={()=>onCheckout('UPI')} disabled={!shift || cart.length===0 || cartStatus==='loading'}>Pay UPI</Button>
@@ -134,6 +176,22 @@ export default function POSPage(){
           <HeldOrders />
         </div>
       </div>
+
+      <DiscountModal
+        open={discountModalOpen}
+        onClose={() => setDiscountModalOpen(false)}
+        cartItems={cart}
+        cartTotals={cartTotals}
+        onApply={handleApplyDiscount}
+      />
+      <RefundOrderModal
+        open={refundOrderOpen}
+        onClose={() => setRefundOrderOpen(false)}
+        onCreated={() => {
+          setRefundOrderOpen(false);
+          toast.success('Refund has been recorded and will appear in Refunds.');
+        }}
+      />
     </div>
   );
 }

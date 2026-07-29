@@ -2,7 +2,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
-import { Building2, Box, FileText, LogOut, Menu, ShoppingCart, Users, UserCog } from 'lucide-react';
+import { Building2, Box, FileText, LogOut, Menu, Repeat, ShoppingCart, UserCog } from 'lucide-react';
 import { logout } from '@/features/auth/authSlice';
 
 const ROLE_ADMIN = 'ROLE_ADMIN';
@@ -33,8 +33,8 @@ export default function AppLayout() {
     { key: 'pos', label: 'POS', icon: ShoppingCart, roles: [ROLE_BRANCH_CASHIER, ROLE_BRANCH_MANAGER, ROLE_STORE_MANAGER, ROLE_STORE_ADMIN, ROLE_ADMIN], to: '/app/pos' },
     { key: 'products', label: 'Products', icon: Box, roles: [ROLE_BRANCH_CASHIER, ROLE_BRANCH_MANAGER, ROLE_STORE_MANAGER, ROLE_STORE_ADMIN, ROLE_ADMIN], to: '/app/products' },
     { key: 'inventory', label: 'Inventory', icon: Box, roles: [ROLE_BRANCH_MANAGER, ROLE_STORE_MANAGER, ROLE_STORE_ADMIN, ROLE_ADMIN], to: '/app/inventory' },
-    { key: 'customers', label: 'Customers', icon: Users, roles: [ROLE_BRANCH_CASHIER, ROLE_BRANCH_MANAGER, ROLE_STORE_MANAGER, ROLE_STORE_ADMIN, ROLE_ADMIN], to: '/app/customers' },
     { key: 'orders', label: 'Orders', icon: FileText, roles: [ROLE_BRANCH_CASHIER, ROLE_BRANCH_MANAGER, ROLE_STORE_MANAGER, ROLE_STORE_ADMIN, ROLE_ADMIN], to: '/app/orders' },
+    { key: 'refunds', label: 'Refunds', icon: Repeat, roles: [ROLE_BRANCH_CASHIER, ROLE_BRANCH_MANAGER, ROLE_STORE_MANAGER, ROLE_STORE_ADMIN, ROLE_ADMIN], to: '/app/refunds' },
     { key: 'shift', label: 'Shift', icon: FileText, roles: [ROLE_BRANCH_CASHIER, ROLE_BRANCH_MANAGER], to: '/app/shift' },
     { key: 'reports', label: 'Reports', icon: FileText, roles: [ROLE_BRANCH_MANAGER, ROLE_STORE_MANAGER, ROLE_STORE_ADMIN, ROLE_ADMIN], to: '/app/reports' },
     { key: 'employees', label: 'Employees', icon: UserCog, roles: [ROLE_ADMIN], to: '/app/employees' },

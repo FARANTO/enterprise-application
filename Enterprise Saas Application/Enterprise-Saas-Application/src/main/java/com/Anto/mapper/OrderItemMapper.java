@@ -14,9 +14,12 @@ public class OrderItemMapper {
         return OrderItemDTO.builder()
                     .id(item.getId())
                     .productId(item.getProduct() != null ? item.getProduct().getId() : null)
-
                     .quantity(item.getQuantity())
                     .price(item.getPrice())
+                    .originalPrice(item.getOriginalPrice())
+                    .discountAmount(item.getDiscountAmount())
+                    .discountMode(item.getDiscountType())
+                    .discountValue(item.getDiscountValue())
                     .product(ProductMapper.toDTO(item.getProduct()))
                     .build();
 

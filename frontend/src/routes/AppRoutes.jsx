@@ -8,8 +8,8 @@ import LoginPage from '@/pages/LoginPage';
 import POSPage from '@/pages/POSPage';
 import ProductsPage from '@/pages/ProductsPage';
 import InventoryPage from '@/pages/InventoryPage';
-import CustomersPage from '@/pages/CustomersPage';
 import OrdersPage from '@/pages/OrdersPage';
+import RefundsPage from '@/pages/RefundsPage';
 import ShiftPage from '@/pages/ShiftPage';
 import ReportsPage from '@/pages/ReportsPage';
 import DashboardPage from '@/pages/DashboardPage';
@@ -57,7 +57,7 @@ const router = createBrowserRouter([
   { path: '/pos', element: <Navigate to="/app/pos" replace /> },
   { path: '/products', element: <Navigate to="/app/products" replace /> },
   { path: '/inventory', element: <Navigate to="/app/inventory" replace /> },
-  { path: '/customers', element: <Navigate to="/app/customers" replace /> },
+  { path: '/customers', element: <Navigate to="/app/pos" replace /> },
   { path: '/orders', element: <Navigate to="/app/orders" replace /> },
   { path: '/shift', element: <Navigate to="/app/shift" replace /> },
   { path: '/reports', element: <Navigate to="/app/reports" replace /> },
@@ -69,8 +69,8 @@ const router = createBrowserRouter([
       { path: 'pos', element: <POSPage /> },
       { path: 'products', element: <ProductsPage /> },
       { path: 'inventory', element: <InventoryPage /> },
-      { path: 'customers', element: <CustomersPage /> },
       { path: 'orders', element: <OrdersPage /> },
+      { path: 'refunds', element: <RequireRole roles={['ROLE_BRANCH_CASHIER', 'ROLE_BRANCH_MANAGER', 'ROLE_STORE_MANAGER', 'ROLE_STORE_ADMIN', 'ROLE_ADMIN']}><RefundsPage /></RequireRole> },
       { path: 'shift', element: <ShiftPage /> },
       { path: 'reports', element: <ReportsPage /> },
       { path: 'dashboard', element: <RequireRole roles={['ROLE_ADMIN', 'ROLE_STORE_ADMIN', 'ROLE_STORE_MANAGER']}><DashboardPage /></RequireRole> },

@@ -1,7 +1,0 @@
-
-> frontend@0.0.0 test
-> vitest --run ; Get-Content test-output-new.txt
-
-
- RUN  v4.1.10 E:/Web Projects/enterprise-application/frontend
-

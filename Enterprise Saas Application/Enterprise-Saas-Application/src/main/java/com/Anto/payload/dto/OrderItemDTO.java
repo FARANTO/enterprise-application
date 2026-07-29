@@ -25,4 +25,9 @@ public class OrderItemDTO {
 
     private Long orderId;
 
+    private Double originalPrice;
+    private Double discountAmount;
+    private String discountMode;
+    private Double discountValue;
+
 }

@@ -4,6 +4,7 @@ import com.Anto.domain.PaymentType;
 import com.Anto.modal.Branch;
 import com.Anto.modal.Order;
 import com.Anto.modal.ShiftReport;
+import com.Anto.payload.dto.RefundItemDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -32,6 +34,7 @@ public class RefundDTO {
 
     private ShiftReport shiftReport;
     private Long shiftReportId;
+    private List<RefundItemDTO> refundItems;
 
     private UserDto cashier;
     private String cashierName;

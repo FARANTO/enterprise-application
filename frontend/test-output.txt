@@ -1,9 +1,0 @@
-
- RUN  v4.1.10 E:/Web Projects/enterprise-application/frontend
-
-
- Test Files  1 passed (1)
-      Tests  4 passed (4)
-   Start at  12:57:37
-   Duration  1.14s (transform 30ms, setup 145ms, import 30ms, tests 20ms, environment 783ms)
-

@@ -37,6 +37,13 @@ public class OrderDTO {
 
     private PaymentType paymentType;
 
+    private Double originalAmount;
+    private Double discountAmount;
+    private String discountType;
+    private Double discountPercentage;
+    private Double discountFlat;
+    private Long authorizedBy;
+
     private List<OrderItemDTO> items;
 
 }

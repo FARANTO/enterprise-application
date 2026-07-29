@@ -20,7 +20,10 @@ export default function RefundModal({ open, onClose, order, onCreated }){
       reason,
       branchId: order.branchId || null,
       paymentType: order.paymentType || null,
-      shiftReportId: null
+      shiftReportId: null,
+      refundItems: Number(amount) === Number(order.totalAmount)
+        ? (order.items || []).map((item) => ({ productId: item.productId, quantity: item.quantity }))
+        : undefined,
     };
     try{
       const res = await dispatch(createRefund(refundDTO)).unwrap();

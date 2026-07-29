@@ -13,6 +13,7 @@ import com.Anto.modal.User;
 import com.Anto.payload.dto.OrderDTO;
 import com.Anto.repository.BranchRepository;
 import com.Anto.repository.CustomerRepository;
+import com.Anto.repository.InventoryRepository;
 import com.Anto.repository.OrderItemRepository;
 import com.Anto.repository.OrderRepository;
 import com.Anto.repository.ProductRepository;
@@ -22,14 +23,17 @@ import com.Anto.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final ProductRepository productRepository;
@@ -37,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final BranchRepository branchRepository;
     private final CustomerRepository customerRepository;
+    private final InventoryRepository inventoryRepository;
     private final StoreRepository storeRepository;
 
     @Override
@@ -109,22 +114,47 @@ public class OrderServiceImpl implements OrderService {
                 .cashier(cashier)
                 .customer(customer)
                 .paymentType(orderDTO.getPaymentType())
+                .originalAmount(orderDTO.getOriginalAmount())
+                .discountAmount(orderDTO.getDiscountAmount())
+                .discountType(orderDTO.getDiscountType())
+                .discountPercentage(orderDTO.getDiscountPercentage())
+                .discountFlat(orderDTO.getDiscountFlat())
+                .authorizedBy(orderDTO.getAuthorizedBy())
                 .build();
 
-        List<OrderItem> orderItems = (orderDTO.getItems() != null ? orderDTO.getItems() : List.<com.Anto.payload.dto.OrderItemDTO>of())
-                .stream().map(itemDto -> {
-                    Product product = productRepository.findById(itemDto.getProductId()).orElseThrow(
-                            () -> new EntityNotFoundException("Product Not found with id: " + itemDto.getProductId())
-                    );
-                    double unitPrice = product.getSellingPrice() != null ? product.getSellingPrice() : (itemDto.getPrice() != null ? itemDto.getPrice() : 0.0);
-                    int qty = itemDto.getQuantity() != null ? itemDto.getQuantity() : 1;
-                    return OrderItem.builder()
-                            .product(product)
-                            .quantity(qty)
-                            .price(unitPrice * qty)
-                            .order(order)
-                            .build();
-                }).toList();
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (com.Anto.payload.dto.OrderItemDTO itemDto : (orderDTO.getItems() != null ? orderDTO.getItems() : List.<com.Anto.payload.dto.OrderItemDTO>of())) {
+            Product product = productRepository.findById(itemDto.getProductId()).orElseThrow(
+                    () -> new EntityNotFoundException("Product Not found with id: " + itemDto.getProductId())
+            );
+            double unitPrice = product.getSellingPrice() != null ? product.getSellingPrice() : (itemDto.getPrice() != null ? itemDto.getPrice() : 0.0);
+            int qty = itemDto.getQuantity() != null ? itemDto.getQuantity() : 1;
+            OrderItem orderItem = OrderItem.builder()
+                    .product(product)
+                    .quantity(qty)
+                    .price(unitPrice * qty)
+                    .originalPrice(itemDto.getOriginalPrice())
+                    .discountAmount(itemDto.getDiscountAmount())
+                    .discountType(itemDto.getDiscountMode())
+                    .discountValue(itemDto.getDiscountValue())
+                    .order(order)
+                    .build();
+
+            if (branch != null) {
+                com.Anto.modal.Inventory inventory = inventoryRepository.findByProductIdAndBranchId(product.getId(), branch.getId());
+                if (inventory == null) {
+                    throw new Exception("No inventory record for product " + product.getName() + " at branch " + branch.getName());
+                }
+                int currentQuantity = inventory.getQuantity() != null ? inventory.getQuantity() : 0;
+                if (currentQuantity < qty) {
+                    throw new Exception("Insufficient stock for product " + product.getName() + " at branch " + branch.getName());
+                }
+                inventory.setQuantity(currentQuantity - qty);
+                inventoryRepository.save(inventory);
+            }
+
+            orderItems.add(orderItem);
+        }
 
         double total = orderItems.stream().mapToDouble(OrderItem::getPrice).sum();
         order.setTotalAmount(total > 0 ? total : (orderDTO.getTotalAmount() != null ? orderDTO.getTotalAmount() : 0.0));
