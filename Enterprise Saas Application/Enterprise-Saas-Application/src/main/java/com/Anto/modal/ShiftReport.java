@@ -1,11 +1,12 @@
 package com.Anto.modal;
 
-
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -27,15 +28,16 @@ public class ShiftReport {
     private Double netSales;
     private int totalOrders;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User cashier;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
 
     @ElementCollection
     @CollectionTable(name = "shift_report_payment_summaries", joinColumns = @JoinColumn(name = "shift_report_id"))
-    private List<PaymentSummary> paymentSummaries;
+    @Builder.Default
+    private List<PaymentSummary> paymentSummaries = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -43,17 +45,14 @@ public class ShiftReport {
             joinColumns = @JoinColumn(name = "shift_report_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private java.util.Set<Product> topSellingProducts;
+    @Builder.Default
+    private Set<Product> topSellingProducts = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private java.util.List<Order> recentOrders;
+    @Transient
+    @Builder.Default
+    private List<Order> recentOrders = new ArrayList<>();
 
-    @OneToMany(mappedBy = "shiftReport", cascade = CascadeType.ALL)
-    private List<Refund> refunds;
-
-
-
-
-
-
+    @OneToMany(mappedBy = "shiftReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Refund> refunds = new ArrayList<>();
 }
