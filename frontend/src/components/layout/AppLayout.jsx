@@ -1,6 +1,6 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Outlet, useNavigate } from 'react-router';
+import { Outlet, useNavigate, useLocation, Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Building2, Box, FileText, LogOut, Menu, Repeat, ShoppingCart, UserCog } from 'lucide-react';
 import { logout } from '@/features/auth/authSlice';
@@ -22,8 +22,15 @@ function getStoredUser() {
 export default function AppLayout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const authUser = useSelector((state) => state.auth.user);
   const user = authUser || getStoredUser();
+
+  // Log location changes with stack trace to debug redirects
+  useEffect(() => {
+    console.log('📍 AppLayout location changed:', location.pathname);
+    console.log('Stack trace:', new Error().stack);
+  }, [location]);
 
   const role = user?.role || user?.Role;
   const storeName = user?.storeName || (user?.storeId ? `Store ${user.storeId}` : '—');
@@ -81,10 +88,14 @@ export default function AppLayout() {
           {visible.map((item) => {
             const Icon = item.icon;
             return (
-              <button key={item.key} onClick={() => navigate(item.to)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition hover:bg-muted">
+              <Link
+                key={item.key}
+                to={item.to}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition hover:bg-muted"
+              >
                 <Icon className="size-4" />
                 {!collapsed && <span>{item.label}</span>}
-              </button>
+              </Link>
             );
           })}
         </nav>

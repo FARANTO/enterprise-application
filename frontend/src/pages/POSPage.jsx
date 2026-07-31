@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductsByStore } from '@/features/products/productsSlice';
 import { fetchInventoryByBranch } from '@/features/inventory/inventorySlice';
 import { fetchStores, fetchBranchesByStore } from '@/features/stores/storesSlice';
-import { getCurrentShift, startShift } from '@/features/shiftReports/shiftReportsSlice';
+import { getCurrentShift } from '@/features/shiftReports/shiftReportsSlice';
 import { addItem, removeItem, setQty, selectCartTotals, processPayment, holdOrder, resumeOrder, clearDiscounts, applyOrderDiscount, applyItemDiscount } from '@/features/cart/cartSlice';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
@@ -43,7 +43,6 @@ export default function POSPage(){
   const isCashier = role === 'ROLE_BRANCH_CASHIER';
   const canChangeStore = isAdmin || isStoreAdmin || isStoreManager;
   const canChangeBranch = isAdmin || isStoreAdmin || isStoreManager;
-  const canStartShiftOnPOS = isCashier;
   const branchFixed = isBranchManager || isCashier;
 
   useEffect(() => {
@@ -102,29 +101,6 @@ export default function POSPage(){
       return toast.error('You cannot add more than the available quantity for this branch.');
     }
     dispatch(addItem({ product: p, quantity: 1 }));
-  }
-
-  async function onStartShift(){
-    // Ensure user is assigned to a branch before starting shift
-    if (!user?.branchId) {
-      // If UI has a selectedBranchId, explain assignment is needed in profile
-      if (selectedBranchId) {
-        toast.error('Your account is not assigned to a branch. Contact admin to assign you to the branch.');
-      } else {
-        toast.error('No branch assignment found. Contact admin to assign your account to a branch.');
-      }
-      return;
-    }
-
-    try{
-      const res = await dispatch(startShift()).unwrap();
-      // refresh shift state explicitly
-      await dispatch(getCurrentShift()).unwrap().catch(()=>{});
-      toast.success('Shift started');
-    } catch (err) {
-      const msg = err?.message || (err && err.toString && err.toString()) || 'Failed to start shift';
-      toast.error(msg);
-    }
   }
 
   async function onCheckout(method){
@@ -193,10 +169,6 @@ export default function POSPage(){
       <div className="col-span-2">
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <input className="input flex-1 min-w-[220px]" placeholder="Search products" value={query} onChange={e=>setQuery(e.target.value)} />
-        {/* Only cashiers should start shifts from the POS screen; branch managers can start shifts from the Shift page */}
-        {canStartShiftOnPOS && !shift && (
-          <Button onClick={onStartShift}>Start Shift</Button>
-        )}
         </div>
         <div className="mb-4 rounded-lg border border-input bg-muted/5 p-3 text-sm text-muted-foreground">
           <div className="flex flex-wrap items-center gap-3">
@@ -357,4 +329,3 @@ function HeldOrders(){
     </div>
   );
 }
-

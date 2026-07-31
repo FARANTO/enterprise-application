@@ -42,26 +42,33 @@ function ProductFormModal({ open, onClose, initial, onSave, categories = [], sto
 
   return (
     <Dialog key={initial?.id || 'new'} open={open} onOpenChange={(value) => !value && onClose()}>
-      <DialogContent>
+      <DialogContent className="max-w-sm sm:max-w-md md:max-w-lg">
         <DialogHeader>
           <DialogTitle>{initial ? 'Edit' : 'New'} product</DialogTitle>
           <DialogDescription>Upload a direct imgbb image link and assign the product to a store.</DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-2">
+        <div className="grid grid-cols-1 gap-4 py-2">
+          {/* Name – full width */}
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" value={form.name} onChange={handleChange} />
           </div>
+
+          {/* SKU – full width */}
           <div className="grid gap-2">
             <Label htmlFor="sku">SKU</Label>
             <Input id="sku" name="sku" value={form.sku} onChange={handleChange} />
           </div>
+
+          {/* Description – full width */}
           <div className="grid gap-2">
             <Label htmlFor="description">Description</Label>
             <Input id="description" name="description" value={form.description} onChange={handleChange} />
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
+
+          {/* MRP and Selling Price – side by side on medium+ screens */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="mrp">MRP</Label>
               <Input id="mrp" name="mrp" type="number" value={form.mrp} onChange={handleChange} />
@@ -71,10 +78,18 @@ function ProductFormModal({ open, onClose, initial, onSave, categories = [], sto
               <Input id="sellingPrice" name="sellingPrice" type="number" value={form.sellingPrice} onChange={handleChange} />
             </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
+
+          {/* Category and New Category – side by side on medium+ screens */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="categoryId">Category</Label>
-              <select id="categoryId" name="categoryId" value={form.categoryId} onChange={handleChange} className="h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm">
+              <select
+                id="categoryId"
+                name="categoryId"
+                value={form.categoryId}
+                onChange={handleChange}
+                className="h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm w-full"
+              >
                 <option value="">Select existing category</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -85,14 +100,26 @@ function ProductFormModal({ open, onClose, initial, onSave, categories = [], sto
             </div>
             <div className="grid gap-2">
               <Label htmlFor="categoryName">New category</Label>
-              <Input id="categoryName" name="categoryName" value={form.categoryName} onChange={handleChange} placeholder="e.g. Shirts" />
+              <Input
+                id="categoryName"
+                name="categoryName"
+                value={form.categoryName}
+                onChange={handleChange}
+                placeholder="e.g. Shirts"
+              />
             </div>
           </div>
 
-          {/* Store selector */}
+          {/* Store selector – full width */}
           <div className="grid gap-2">
             <Label htmlFor="storeId">Store</Label>
-            <select id="storeId" name="storeId" value={form.storeId} onChange={handleChange} className="h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm">
+            <select
+              id="storeId"
+              name="storeId"
+              value={form.storeId}
+              onChange={handleChange}
+              className="h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm w-full"
+            >
               <option value="">Select a store</option>
               {stores.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -102,16 +129,35 @@ function ProductFormModal({ open, onClose, initial, onSave, categories = [], sto
             </select>
           </div>
 
+          {/* Image URL – full width */}
           <div className="grid gap-2">
             <Label htmlFor="image">Image URL</Label>
-            <Input id="image" name="image" value={form.image} onChange={handleChange} placeholder="https://i.ibb.co/..." />
+            <Input
+              id="image"
+              name="image"
+              value={form.image}
+              onChange={handleChange}
+              placeholder="https://i.ibb.co/..."
+            />
           </div>
-          {form.image && <img src={form.image} alt="preview" className="max-h-40 w-full rounded-xl object-contain" />}
+
+          {/* Image preview – responsive max height */}
+          {form.image && (
+            <div className="flex justify-center">
+              <img
+                src={form.image}
+                alt="preview"
+                className="max-h-40 w-full max-w-xs rounded-xl object-contain"
+              />
+            </div>
+          )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={submit}>{initial ? 'Save changes' : 'Create product'}</Button>
+        <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
+          <Button onClick={submit} className="w-full sm:w-auto">
+            {initial ? 'Save changes' : 'Create product'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
