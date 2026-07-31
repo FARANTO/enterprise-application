@@ -98,7 +98,9 @@ public class ShiftReportServiceImpl implements ShiftReportService {
 
         shiftReport.setPaymentSummaries(getPaymentSummaries(orders, totalSales));
         refunds.forEach(refund -> refund.setShiftReport(shiftReport));
-        shiftReport.setRefunds(refunds);
+        // FIX: Do NOT replace the refunds collection – modify the existing one
+        shiftReport.getRefunds().clear();
+        shiftReport.getRefunds().addAll(refunds);
 
         ShiftReport savedReport = shiftReportRepository.save(shiftReport);
         return ShiftReportMapper.toDTO(savedReport);
@@ -163,7 +165,9 @@ public class ShiftReportServiceImpl implements ShiftReportService {
 
         shiftReport.setPaymentSummaries(getPaymentSummaries(orders, totalSales));
         refunds.forEach(refund -> refund.setShiftReport(shiftReport));
-        shiftReport.setRefunds(refunds);
+        // FIX: Do NOT replace the refunds collection – modify the existing one
+        shiftReport.getRefunds().clear();
+        shiftReport.getRefunds().addAll(refunds);
 
         ShiftReport savedReport = shiftReportRepository.save(shiftReport);
         return ShiftReportMapper.toDTO(savedReport);
