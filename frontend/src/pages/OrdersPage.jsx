@@ -14,9 +14,6 @@ function getCurrentUser(){ try { return JSON.parse(localStorage.getItem('user')|
 export default function OrdersPage(){
   const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
-  // Refresh helpers imported from slices
-  
-
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [refundOpen, setRefundOpen] = useState(false);
@@ -31,6 +28,7 @@ export default function OrdersPage(){
   const isStoreAdmin = role === 'ROLE_STORE_ADMIN';
   const isStoreManager = role === 'ROLE_STORE_MANAGER';
   const isBranchManager = role === 'ROLE_BRANCH_MANAGER';
+  const isCashier = role === 'ROLE_BRANCH_CASHIER';
   const branchId = user?.branchId;
   const storeId = user?.storeId;
 
@@ -38,6 +36,7 @@ export default function OrdersPage(){
   const branches = useSelector((state) => state.stores.branches || []);
   const allBranches = useSelector((state) => state.stores.allBranches || []);
 
+  // ----- Initial data load (stores, branches, branch selection) -----
   useEffect(() => {
     dispatch(fetchStores());
     if (isAdmin) {
@@ -50,8 +49,19 @@ export default function OrdersPage(){
     if (isBranchManager && branchId) {
       setSelectedBranchId(String(branchId));
     }
-  }, [dispatch, isAdmin, isStoreAdmin, isStoreManager, isBranchManager, storeId, branchId]);
+    // ✅ Cashier: use storeId if available (branchId is null)
+    if (isCashier) {
+      if (storeId) {
+        setSelectedStoreId(String(storeId));
+      }
+      // If branchId is present, prefer that
+      if (branchId) {
+        setSelectedBranchId(String(branchId));
+      }
+    }
+  }, [dispatch, isAdmin, isStoreAdmin, isStoreManager, isBranchManager, isCashier, storeId, branchId]);
 
+  // ----- Auto‑select first branch (for admin/manager) or use store -----
   useEffect(() => {
     if (!selectedBranchId) {
       if (isAdmin && allBranches.length > 0) {
@@ -62,42 +72,51 @@ export default function OrdersPage(){
         setSelectedBranchId(String(branchId));
       }
     }
+    // If no branch is set but we have storeId (cashier), we rely on store API
   }, [allBranches, branches, branchId, selectedBranchId, isAdmin, isStoreAdmin, isStoreManager]);
 
-  useEffect(()=>{
-    async function load(){
+  // ----- Load orders when branch or store changes -----
+  useEffect(() => {
+    async function load() {
       setLoading(true);
-      try{
+      try {
         let res;
         if (selectedBranchId) {
+          // 1. Use branch if selected
           res = await axiosClient.get(`/api/orders/branch/${selectedBranchId}`);
-        } else if ((isStoreAdmin || isStoreManager) && storeId) {
-          res = await axiosClient.get(`/api/orders/store/${storeId}`);
+        } else if (selectedStoreId) {
+          // 2. Fallback to store (for cashiers or if no branch)
+          res = await axiosClient.get(`/api/orders/store/${selectedStoreId}`);
         } else {
           res = { data: [] };
         }
         setOrders(res.data || []);
-      } catch(e){ console.error(e); }
+      } catch (e) {
+        console.error('Failed to load orders:', e);
+        setOrders([]);
+      }
       setLoading(false);
     }
     load();
-  },[selectedBranchId, storeId, isStoreAdmin, isStoreManager]);
+  }, [selectedBranchId, selectedStoreId]);
 
-  async function refresh(){
-    try{
+  async function refresh() {
+    try {
       let res;
       if (selectedBranchId) {
         res = await axiosClient.get(`/api/orders/branch/${selectedBranchId}`);
-      } else if ((isStoreAdmin || isStoreManager) && storeId) {
-        res = await axiosClient.get(`/api/orders/store/${storeId}`);
+      } else if (selectedStoreId) {
+        res = await axiosClient.get(`/api/orders/store/${selectedStoreId}`);
       } else {
         res = { data: [] };
       }
       setOrders(res.data || []);
-    } catch(e){ console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  function printReceipt(order){
+  function printReceipt(order) {
     setReceiptOrder(order);
     setReceiptOpen(true);
   }
@@ -109,6 +128,7 @@ export default function OrdersPage(){
           <h1 className="text-2xl font-semibold">Orders</h1>
           <Button variant="outline" onClick={refresh}>Refresh</Button>
         </div>
+        {/* Branch selector – shown only to admin/store managers/owners */}
         {(isAdmin || isStoreAdmin || isStoreManager) && (
           <div className="flex flex-wrap gap-3 items-center">
             {(isAdmin || isStoreAdmin || isStoreManager) && (
@@ -139,7 +159,9 @@ export default function OrdersPage(){
       </div>
 
       <table className="w-full">
-        <thead className="text-sm text-muted-foreground text-left"><tr><th>ID</th><th>Amount</th><th>Cashier</th><th>Date</th><th></th></tr></thead>
+        <thead className="text-sm text-muted-foreground text-left">
+          <tr><th>ID</th><th>Amount</th><th>Cashier</th><th>Date</th><th></th></tr>
+        </thead>
         <tbody>
           {orders.map(o => (
             <tr key={o.id} className="border-t">
@@ -148,15 +170,14 @@ export default function OrdersPage(){
               <td>{o.cashier?.FullName || o.cashierName || '—'}</td>
               <td>{o.createdAt ? new Date(o.createdAt).toLocaleString() : '—'}</td>
               <td className="text-right">
-                <Button variant="ghost" onClick={()=>setSelected(o)}>View</Button>
-                <Button variant="outline" onClick={()=>printReceipt(o)}>Print</Button>
-              {/* Refund button per order for authorized roles */}
-              <RequireRole roles={[ 'ROLE_BRANCH_CASHIER','ROLE_BRANCH_MANAGER','ROLE_STORE_MANAGER','ROLE_STORE_ADMIN','ROLE_ADMIN' ]}>
-                <Button variant="destructive" onClick={()=>{ setSelected(o); setRefundOpen(true); }}>Refund</Button>
-              </RequireRole>
-            </td>
-          </tr>
-        ))}
+                <Button variant="ghost" onClick={() => setSelected(o)}>View</Button>
+                <Button variant="outline" onClick={() => printReceipt(o)}>Print</Button>
+                <RequireRole roles={[ 'ROLE_BRANCH_CASHIER','ROLE_BRANCH_MANAGER','ROLE_STORE_MANAGER','ROLE_STORE_ADMIN','ROLE_ADMIN' ]}>
+                  <Button variant="destructive" onClick={() => { setSelected(o); setRefundOpen(true); }}>Refund</Button>
+                </RequireRole>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
@@ -166,7 +187,7 @@ export default function OrdersPage(){
             <div className="flex justify-between items-start">
               <h3 className="text-lg font-semibold">Order #{selected.id}</h3>
               <div>
-                <Button variant="outline" onClick={()=>setSelected(null)}>Close</Button>
+                <Button variant="outline" onClick={() => setSelected(null)}>Close</Button>
               </div>
             </div>
 
@@ -187,9 +208,9 @@ export default function OrdersPage(){
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                <Button variant="outline" onClick={()=>printReceipt(selected)}>Print</Button>
+                <Button variant="outline" onClick={() => printReceipt(selected)}>Print</Button>
                 <RequireRole roles={[ 'ROLE_BRANCH_CASHIER','ROLE_BRANCH_MANAGER','ROLE_STORE_MANAGER','ROLE_STORE_ADMIN','ROLE_ADMIN' ]}>
-                  <Button variant="destructive" onClick={()=>setRefundOpen(true)}>Refund</Button>
+                  <Button variant="destructive" onClick={() => setRefundOpen(true)}>Refund</Button>
                 </RequireRole>
               </div>
             </div>
@@ -197,18 +218,15 @@ export default function OrdersPage(){
         </div>
       )}
 
-      <RefundModal open={refundOpen} onClose={()=>setRefundOpen(false)} order={selected} onCreated={()=>{
+      <RefundModal open={refundOpen} onClose={() => setRefundOpen(false)} order={selected} onCreated={() => {
         setRefundOpen(false);
         setSelected(null);
         refresh();
-        try { dispatch(fetchInventoryByBranch(Number(selectedBranchId))); } catch(e){}
-        try { dispatch(getCurrentShift()); } catch(e){}
+        try { dispatch(fetchInventoryByBranch(Number(selectedBranchId))); } catch(e) {}
+        try { dispatch(getCurrentShift()); } catch(e) {}
       }} />
 
-      <ReceiptModal open={receiptOpen} onClose={()=>setReceiptOpen(false)} order={receiptOrder} />
-
+      <ReceiptModal open={receiptOpen} onClose={() => setReceiptOpen(false)} order={receiptOrder} />
     </div>
   );
 }
-
-
