@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
+import RouteLoader from '@/components/ui/RouteLoader';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '@/features/auth/authSlice';
 import { Button } from '@/components/ui/button';
@@ -15,18 +16,25 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const [showLoader, setShowLoader] = useState(false);
+
   useEffect(() => {
     if (auth.status === 'succeeded' && auth.token) {
       if (auth.user) {
         try { localStorage.setItem('user', JSON.stringify(auth.user)); } catch (err) { void err; }
       }
       toast.success('Logged in');
-      navigate('/app/pos');
+      // show transition loader then navigate
+      setShowLoader(true);
     }
     if (auth.status === 'failed') {
       toast.error(auth.error || 'Login failed');
     }
   }, [auth.status, auth.token, auth.user, auth.error, navigate]);
+
+  useEffect(() => {
+    // when loader completes it will clear and do the navigation; handled in RouteLoader onComplete
+  }, [showLoader]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -51,6 +59,14 @@ export default function LoginPage() {
           {loading ? 'Signing in...' : 'Sign in'}
         </Button>
       </form>
+
+      {/* Show route loader while redirecting after successful login */}
+      <RouteLoader
+        open={showLoader}
+        initialBg={'oklch(0.527 0.154 150.069)'}
+        targetBg={'oklch(0.527 0.154 150.069)'}
+        onComplete={() => { setShowLoader(false); navigate('/app/pos'); }}
+      />
     </div>
   );
 }

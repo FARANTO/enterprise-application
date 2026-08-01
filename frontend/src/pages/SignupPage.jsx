@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import RouteLoader from '@/components/ui/RouteLoader';
 import { useDispatch, useSelector } from 'react-redux';
 import { signup } from '@/features/auth/authSlice';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ export default function SignupPage() {
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
+  const [showLoader, setShowLoader] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -92,10 +94,20 @@ export default function SignupPage() {
         </Button>
         <div className="mt-6 text-center text-sm text-slate-200">
           Already have an account?{' '}
-          <button type="button" className="font-semibold text-white underline" onClick={() => navigate('/login')}>
+          <button type="button" className="font-semibold text-white underline" onClick={() => setShowLoader(true)}>
             Sign in
           </button>
         </div>
+
+      </form>
+
+      {/* Route transition loader shown when user clicks "Sign in" */}
+      <RouteLoader
+        open={showLoader}
+        initialBg={"radial-gradient(circle at 0 0, #ffffff29, #0000 18%), radial-gradient(circle at 100% 100%, #ffffff1a, #0000 20%), #d44744"}
+        targetBg={'oklch(0.527 0.154 150.069)'}
+        onComplete={() => { setShowLoader(false); navigate('/login'); }}
+      />
       </form>
     </div>
   );
