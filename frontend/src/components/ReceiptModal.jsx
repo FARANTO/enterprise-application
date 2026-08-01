@@ -1,6 +1,9 @@
 import { Button } from '@/components/ui/button';
+import { useRef } from 'react';
 
 export default function ReceiptModal({ open, onClose, order }) {
+  const printWindowRef = useRef(null);
+
   if (!open || !order) return null;
 
   const itemsHtml = (order.items || []).map((item) => {
@@ -10,16 +13,13 @@ export default function ReceiptModal({ open, onClose, order }) {
     return `<tr><td>${name}</td><td>${item.quantity || 0}</td><td>₹${price}</td><td>₹${total}</td></tr>`;
   }).join('');
 
-  function printReceipt() {
-    const w = window.open('', 'PRINT', 'width=600,height=800');
-    if (!w) return;
-
+  function buildReceiptHTML() {
     const createdAt = order.createdAt ? new Date(order.createdAt).toLocaleString() : '';
     const branchName = order.branch?.name || order.branchName || '';
     const storeName = order.store?.name || order.storeName || '';
     const cashierName = order.cashier?.fullName || order.cashier?.FullName || order.cashierName || '';
 
-    const html = `
+    return `
       <html>
         <head>
           <title>Receipt ${order.id}</title>
@@ -52,12 +52,31 @@ export default function ReceiptModal({ open, onClose, order }) {
         </body>
       </html>
     `;
+  }
 
+  function printReceipt() {
+    // Step 1: Open the window synchronously (right on click)
+    const w = window.open('', 'PRINT', 'width=600,height=800');
+    if (!w) {
+      // Popup blocked – fallback: print current modal content with a print stylesheet
+      alert('Popup blocked. Please allow popups for this site, or use the browser’s print function (Ctrl+P).');
+      return;
+    }
+
+    // Store reference so we can reuse it if needed
+    printWindowRef.current = w;
+
+    // Step 2: Write HTML content
+    const html = buildReceiptHTML();
     w.document.open();
     w.document.write(html);
     w.document.close();
     w.focus();
-    setTimeout(() => { w.print(); }, 500);
+
+    // Step 3: Trigger print after a short delay to ensure content is rendered
+    setTimeout(() => {
+      w.print();
+    }, 500);
   }
 
   return (
