@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
+import MainContentLoader from '@/components/ui/MainContentLoader';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router';
 import { Button } from '@/components/ui/button';
@@ -71,6 +72,15 @@ export default function AppLayout() {
     window.location.reload();
   }
 
+  const [mainLoading, setMainLoading] = useState(false);
+
+  // when location changes (navigation happened) hide the main loader after a short delay
+  useEffect(() => {
+    // hide loader after route change completes (allow 700ms to show transition)
+    const t = setTimeout(() => setMainLoading(false), 700);
+    return () => clearTimeout(t);
+  }, [location.pathname]);
+
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <aside className={`border-r bg-card/80 transition-all duration-300 ${collapsed ? 'w-18' : 'w-64'}`}>
@@ -91,6 +101,7 @@ export default function AppLayout() {
               <Link
                 key={item.key}
                 to={item.to}
+                onClick={() => setMainLoading(true)}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition hover:bg-muted"
               >
                 <Icon className="size-4" />
@@ -109,27 +120,36 @@ export default function AppLayout() {
       </aside>
 
       <div className="flex-1 p-6">
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-card p-4 shadow-sm">
-          <div>
-            <h2 className="text-xl font-semibold">Welcome, {user?.fullName || user?.FullName || user?.email || user?.Email || 'User'}</h2>
-            <p className="text-sm text-muted-foreground">{role || 'User'}</p>
+        {mainLoading ? (
+          // while loading, do not render header or Outlet — show only the loader centered in this area
+          <div className="relative min-h-[60vh] flex items-center justify-center">
+            <MainContentLoader open={true} />
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">{storeName} • {branchName}</span>
-            {branches && Array.isArray(branches) && (
-              <select value={activeBranch || ''} onChange={(event) => onSwitchBranch(Number(event.target.value))} className="h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm">
-                <option value="">Select branch</option>
-                {branches.map((branch) => (
-                  <option key={branch.id} value={branch.id}>{branch.name || `Branch ${branch.id}`}</option>
-                ))}
-              </select>
-            )}
-          </div>
-        </header>
+        ) : (
+          <>
+            <header className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-card p-4 shadow-sm">
+              <div>
+                <h2 className="text-xl font-semibold">Welcome, {user?.fullName || user?.FullName || user?.email || user?.Email || 'User'}</h2>
+                <p className="text-sm text-muted-foreground">{role || 'User'}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground">{storeName} • {branchName}</span>
+                {branches && Array.isArray(branches) && (
+                  <select value={activeBranch || ''} onChange={(event) => onSwitchBranch(Number(event.target.value))} className="h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm">
+                    <option value="">Select branch</option>
+                    {branches.map((branch) => (
+                      <option key={branch.id} value={branch.id}>{branch.name || `Branch ${branch.id}`}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            </header>
 
-        <main>
-          <Outlet />
-        </main>
+            <main className="relative">
+              <Outlet />
+            </main>
+          </>
+        )}
       </div>
     </div>
   );
