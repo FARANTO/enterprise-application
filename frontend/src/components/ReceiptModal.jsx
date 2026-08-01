@@ -55,25 +55,33 @@ export default function ReceiptModal({ open, onClose, order }) {
   }
 
   function printReceipt() {
-    // Step 1: Open the window synchronously (right on click)
-    const w = window.open('', 'PRINT', 'width=600,height=800');
+    // First, try to open a new window directly
+    let w = window.open('', '_blank', 'width=600,height=800');
+    
+    // If that fails, try using a dummy anchor click (more likely to bypass blockers)
     if (!w) {
-      // Popup blocked – fallback: print current modal content with a print stylesheet
-      alert('Popup blocked. Please allow popups for this site, or use the browser’s print function (Ctrl+P).');
-      return;
+      const anchor = document.createElement('a');
+      anchor.target = '_blank';
+      anchor.href = 'about:blank';
+      anchor.click();
+      w = window.open('', '_blank', 'width=600,height=800');
+      
+      // If still null, show alert and fallback to in-page print
+      if (!w) {
+        alert('Unable to open print window. Please use your browser\'s print function (Ctrl+P) to print this page, or allow popups for this site.');
+        // Optionally, trigger window.print() on the current page as fallback
+        // window.print();
+        return;
+      }
     }
 
-    // Store reference so we can reuse it if needed
     printWindowRef.current = w;
-
-    // Step 2: Write HTML content
     const html = buildReceiptHTML();
     w.document.open();
     w.document.write(html);
     w.document.close();
     w.focus();
 
-    // Step 3: Trigger print after a short delay to ensure content is rendered
     setTimeout(() => {
       w.print();
     }, 500);
