@@ -101,7 +101,17 @@ export default function AppLayout() {
               <Link
                 key={item.key}
                 to={item.to}
-                onClick={() => setMainLoading(true)}
+                onClick={() => {
+                  // If already on the exact same path, do not trigger the main loader
+                  try {
+                    if (location.pathname !== item.to) {
+                      setMainLoading(true);
+                    }
+                  } catch (err) {
+                    // fallback: set loader
+                    setMainLoading(true);
+                  }
+                }}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition hover:bg-muted"
               >
                 <Icon className="size-4" />
