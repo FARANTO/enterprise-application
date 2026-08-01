@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { LoaderIcon } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+// Simple inline progress bar instead of importing a missing Progress component
 
 // Full-screen route transition loader
 export default function RouteLoader({
@@ -80,7 +80,12 @@ export default function RouteLoader({
 
         <div className="w-full flex justify-center">
           <div className="w-[60%] max-w-xl">
-            <Progress value={progress} className="h-2 rounded-full bg-white/20" />
+            <div className="w-full h-2 rounded-full bg-white/20 overflow-hidden">
+              <div
+                className="h-full bg-white"
+                style={{ width: `${progress}%`, transition: 'width 120ms linear' }}
+              />
+            </div>
           </div>
         </div>
       </div>

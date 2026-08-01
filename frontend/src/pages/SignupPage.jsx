@@ -108,7 +108,6 @@ export default function SignupPage() {
         targetBg={'oklch(0.527 0.154 150.069)'}
         onComplete={() => { setShowLoader(false); navigate('/login'); }}
       />
-      </form>
     </div>
   );
 }
